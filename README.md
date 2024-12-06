@@ -1,4 +1,4 @@
-# VisualSemanticUnderstanding (still  under development)
+# Visual Semantic Understanding (still  under development)
 
 [![arXiv](https://img.shields.io/badge/arXiv-2406.15359-B31B1B.svg)](https://arxiv.org/abs/2406.15359)
 
