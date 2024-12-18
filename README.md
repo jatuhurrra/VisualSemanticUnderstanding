@@ -1,67 +1,39 @@
-# Visual Semantic Understanding (still  under development)
+# Visual Semantic Understanding
 
 [![arXiv](https://img.shields.io/badge/arXiv-2406.15359-B31B1B.svg)](https://arxiv.org/abs/2406.15359)
 
-<h3>Overview</h3>
-Large language models (LLM) are known for their vast knowledge coverage. But how much of that knowledge is relevant or accurate for extracting specific information regarding biological species such as amphibians, arthropods, birds, fishes, etc.? In this project, we set out to answer this question. 
+### Overview
+The paper introduces RapidNER, a framework for constructing multilingual visual-text datasets to evaluate Vision Language Models (VLMs). The researchers developed datasets in four languages (English, Japanese, Swahili, and Urdu) for nine vision-and-language tasks, including a new task called "unrelatedness." The work addresses the lack of comprehensive evaluation datasets for low-resource languages and introduces rationales to better understand VLM reasoning processes.
 
-We leverage a state-of-the-art LLM (i.e., GPT-4) and distill its knowledge to create datasets for both named entity recognition (NER) and relation extraction (RE).
+### Data Creation
 
-<h3>The Dataset</h3>
-Two separate datasets, one for NER and another for RE were created. Each consists of 1.8K senetnces. 
-The NER dataset is contained in the **HARU_bio_1.json** file. The tags are in **BIO** format. The Topics covered in this dataset are: **SPECIES, HABITAT, FEEDING, BREEDING**. 
+- Created datasets from Wikinews and Wikipedia articles across 10 categories (animals, products, buildings, locations, events, food, drinks, hobbies, works of art, and organization)
+- Collected 1,000 image-text pairs initially, then selected 200 representative pairs for detailed analysis
+- Used RapidNER framework which operates through:
+  - Extracting domain-specific sub-graphs from Wikidata
+  - Using Elasticsearch for efficient annotation (reducing annotation time from 1 minute to 0.9 milliseconds per sentence)
+  - Translation tools: DeepL for English-Japanese, ChatGPT for English-Swahili, and Google Translate for English-Urdu
+- Created nine vision-language tasks including Object Recognition (OR), Scene Understanding (SU), Relationship Understanding (RU), Semantic Segmentation (SS), Image Captioning (IC), and others
+- Each sample includes both an answer and a rationale explaining the reasoning process
 
-***
+### Experiments
 
-```
-{ 
-'tokens': {"0": ["Poco", "Bueno", "was", "a", "American", "Quarter", "Horse", "stallion", "foaled", "April", "10", ",", "1944", "."], "1": ["Formal", "breeds", "often", "considered", "to", "be", "of", "the", "pit", "bull", "type", "include", "the", "American", "Pit", "Bull", "Terrier", ",", "American", "Staffordshire", "Terrier", ",", "American", "Bully", ",", "and", "Staffordshire", "Bull", "Terrier", "."], ... },
- 'tags': {"0": ["O", "O", "O", "O", "B-PET", "I-PET", "I-PET", "O", "O", "O", "O", "O", "O", "O"], "1": ["O", "O", "O", "O", "O", "O", "O", "O", "B-PET", "I-PET", "O", "O", "O", "O", "B-PET", "I-PET", "I-PET", "O", "B-PET", "I-PET", "I-PET", "O", "B-PET", "I-PET", "O", "O", "B-PET", "I-PET", "I-PET", "O"], ...}
- }
-```
-***
-The two dictionaries `label2id` and `id2label` are shown below: 
+- Evaluated GPT-4V's performance across all tasks in four languages
+- Used eight human evaluators (two for each language) to assess translation quality and task performance
+- Fine-tuned LLaVA 1.5 on the test set for comparison with GPT-4V
+- Used a 5-point Likert scale for human evaluation of both translations and model outputs
+- Conducted cross-language performance analysis
+- Evaluated model performance separately for image-only tasks versus combined image-and-text tasks
 
-Dictionary One: `label2id`
-```
-{'B-JOB': 0,
- 'B-PET': 1,
- 'I-PEOPLENAME': 2,
- 'B-PEOPLENAME': 3,
- 'I-COUNTRY': 4,
- 'O': 5,
- 'I-ORG': 6,
- 'I-JOB': 7,
- 'B-COUNTRY': 8,
- 'I-PET': 9,
- 'B-ORG': 10}
-```
-Dictionary Two: `id2label`
-```
-{0: 'B-JOB',
- 1: 'B-PET',
- 2: 'I-PEOPLENAME',
- 3: 'B-PEOPLENAME',
- 4: 'I-COUNTRY',
- 5: 'O',
- 6: 'I-ORG',
- 7: 'I-JOB',
- 8: 'B-COUNTRY',
- 9: 'I-PET',
- 10: 'B-ORG'}
- ```
- ***
+### Key Findings
 
-Moreover, the RE dataset is of the format below:
-```
-{ 
-'tokens': {"0": ["Poco", "Bueno", "was", "a", "American", "Quarter", "Horse", "stallion", "foaled", "April", "10", ",", "1944", "."], "1": ["Formal", "breeds", "often", "considered", "to", "be", "of", "the", "pit", "bull", "type", "include", "the", "American", "Pit", "Bull", "Terrier", ",", "American", "Staffordshire", "Terrier", ",", "American", "Bully", ",", "and", "Staffordshire", "Bull", "Terrier", "."], ... },
- 'tags': {"0": ["O", "O", "O", "O", "B-PET", "I-PET", "I-PET", "O", "O", "O", "O", "O", "O", "O"], "1": ["O", "O", "O", "O", "O", "O", "O", "O", "B-PET", "I-PET", "O", "O", "O", "O", "B-PET", "I-PET", "I-PET", "O", "B-PET", "I-PET", "I-PET", "O", "B-PET", "I-PET", "O", "O", "B-PET", "I-PET", "I-PET", "O"], ...}
- }
-```
-
-<h3>Experiments</h3>
-We deploy several LLMs for the NER and RE evaluation.
+- GPT-4V performed best in English (94.81% average accuracy), followed by Urdu (90.56%), Japanese (88.09%), and Swahili (83.57%)
+- Model performed better on tasks requiring only image understanding compared to tasks requiring both image and text comprehension
+- Object Recognition (OR) was consistently the best-performing task across languages
+- Entity Extraction (EE) was generally the most challenging task
+- The quality of translations impacted model performance, with Urdu translations being most accurate (81.20%), followed by Japanese (73.82%) and Swahili (65.75%)
+- GPT-4V showed high self-confidence (4.826 out of 5) but was often over-confident in its responses
+- LLaVA 1.5 showed limited similarity with GPT-4V responses (0.1821 average partial match score), indicating significant performance gaps between open and closed-source models
 
 ### Citation
 
